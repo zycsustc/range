@@ -3,19 +3,20 @@ const RangeNode = require('./model/range_node')
 const invalidRangeInputMsg = "Input value is not a legal range!";
 
 class RangeList {
+    // RangeNodes are stored in this array.
     ranges = [];
 
     add(range) {
         // Input type judgement.
-        if (!this.isRange(range)) {
+        if (!this.isValidRange(range)) {
             console.log(invalidRangeInputMsg)
             return;
         }
 
         const [a, b] = range;
-
-        // First, deal with some special cases where new range can enlarge the boundary of the whole range area.
         if (a === b) return;
+
+        // Deal with some special cases where new range can enlarge the boundary of the whole range area.
         if (this.ranges.length === 0) {
             this.ranges = [this.createStartNode(a), this.createEndNode(b)]
             return;
@@ -66,23 +67,22 @@ class RangeList {
             return;
         }
 
-        // Second, deal with normal cases where new range lays in the existed range area.
+        // Deal with normal cases where new range lays in the existed range area.
         const [beforeA, afterA] = this.getBoundary(a);
         const [beforeB, afterB] = this.getBoundary(b);
+        let indexA = this.ranges.indexOf(afterA);
+        let indexB = this.ranges.indexOf(afterB);
+
         if (beforeA.isEnd() && beforeB.isEnd()) {
-            let indexA = this.ranges.indexOf(afterA);
-            let indexB = this.ranges.indexOf(afterB);
             this.ranges = [...this.ranges.slice(0, indexA), this.createStartNode(a), this.createEndNode(b), ...this.ranges.slice(indexB)];
             return;
         }
         if (beforeA.isEnd() && beforeB.isStart()) {
-            let indexA = this.ranges.indexOf(afterA);
             this.ranges[indexA] = this.createStartNode(a);
             return;
         }
         if (beforeA.isStart() && beforeB.isStart()) {
             let indexA = this.ranges.indexOf(beforeA);
-            let indexB = this.ranges.indexOf(afterB);
             this.ranges = [...this.ranges.slice(0, indexA), beforeA, afterB, ...this.ranges.slice(indexB + 1)];
             return;
         }
@@ -94,7 +94,7 @@ class RangeList {
 
     remove(range) {
         // Input type judgement.
-        if (!this.isRange(range)) {
+        if (!this.isValidRange(range)) {
             console.log(invalidRangeInputMsg)
             return;
         }
@@ -172,6 +172,7 @@ class RangeList {
     }
 
     print() {
+        // If range list is empty, use [] as default output result.
         let printedRangeList = '';
         if (this.ranges.length === 0) {
             console.log("[]");
@@ -186,10 +187,11 @@ class RangeList {
     }
 
     // The input value must be an array having two integer elements, beginning and end of the range.
-    isRange(input) {
+    isValidRange(input) {
         return input instanceof Array && input.length === 2 && Number.isInteger(input[0]) && Number.isInteger(input[1]);
     }
 
+    // Some helper methods.
     rangeMaxVal = () => this.ranges[this.ranges.length - 1].val;
     rangeMinVal = () => this.ranges[0].val;
 
