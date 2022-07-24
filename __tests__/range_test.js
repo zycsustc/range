@@ -1,4 +1,4 @@
-const RangeList = require('../index')
+const RangeList = require('../range_list')
 
 let rl;
 

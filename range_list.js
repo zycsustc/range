@@ -1,7 +1,5 @@
 const RangeNode = require('./model/range_node')
 
-const invalidRangeInputMsg = "Input value is not a legal range!";
-
 class RangeList {
     // RangeNodes are stored in this array.
     ranges = [];
@@ -9,7 +7,7 @@ class RangeList {
     add(range) {
         // Input type judgement.
         if (!this.isValidRange(range)) {
-            console.log(invalidRangeInputMsg)
+            console.log(INVALID_INPUT_MSG)
             return;
         }
 
@@ -95,7 +93,7 @@ class RangeList {
     remove(range) {
         // Input type judgement.
         if (!this.isValidRange(range)) {
-            console.log(invalidRangeInputMsg)
+            console.log(INVALID_INPUT_MSG)
             return;
         }
         if (this.ranges.length === 0) return;

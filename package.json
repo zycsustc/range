@@ -2,7 +2,7 @@
   "name": "range",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "range_list.js",
   "scripts": {
     "test": "jest"
   },

@@ -1,0 +1,1 @@
+const INVALID_INPUT_MSG = "Input value is not a legal range!";
