@@ -9,6 +9,15 @@ test('given invalid input', () => {
 
     rl.add(10);
     expect(console.log).toHaveBeenCalledWith("Input value is not a legal range!");
+
+    rl.add([1, 2, 3]);
+    expect(console.log).toHaveBeenCalledWith("Input value is not a legal range!");
+
+    rl.add("test");
+    expect(console.log).toHaveBeenCalledWith("Input value is not a legal range!");
+
+    rl.remove({a: 1});
+    expect(console.log).toHaveBeenCalledWith("Input value is not a legal range!");
 })
 
 test('given empty range list and print', () => {
