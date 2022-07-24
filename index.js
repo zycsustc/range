@@ -78,11 +78,13 @@ class RangeList {
         if (beforeA.isEnd() && beforeB.isStart()) {
             let indexA = this.ranges.indexOf(afterA);
             this.ranges[indexA] = this.createStartNode(a);
+            return;
         }
         if (beforeA.isStart() && beforeB.isStart()) {
             let indexA = this.ranges.indexOf(beforeA);
             let indexB = this.ranges.indexOf(afterB);
             this.ranges = [...this.ranges.slice(0, indexA), beforeA, afterB, ...this.ranges.slice(indexB + 1)];
+            return;
         }
         if (beforeA.isStart() && beforeB.isEnd()) {
             let indexB = this.ranges.indexOf(beforeB);
@@ -96,10 +98,85 @@ class RangeList {
             console.log(invalidRangeInputMsg)
             return;
         }
+        if (this.ranges.length === 0) return;
+
+        const [a, b] = range;
+        if (a === b) return;
+
+        // Deal with special cases where a or b exceeds existed range boundary.
+        if (a >= this.rangeMaxVal()) {
+            if (a === this.rangeMaxVal()) {
+                this.ranges[this.ranges.length - 1].val -= 1;
+            }
+            return;
+        }
+        if (b <= this.rangeMinVal()) return;
+        if (a <= this.rangeMinVal() && b >= this.rangeMaxVal()) {
+            this.ranges = [];
+            return;
+        }
+        if (a <= this.rangeMinVal()) {
+            const [beforeB, afterB] = this.getBoundary(b);
+            const indexB = this.ranges.indexOf(afterB);
+            if (beforeB.isStart()) {
+                this.ranges = [this.createStartNode(b), ...this.ranges.slice(indexB)];
+                return;
+            }
+            if (beforeB.isEnd()) {
+                this.ranges = this.ranges.slice(indexB);
+                return;
+            }
+        }
+        if (b >= this.rangeMaxVal()) {
+            const [beforeA, afterA] = this.getBoundary(a);
+            const indexA = this.ranges.indexOf(afterA);
+            if (beforeA.isStart()) {
+                this.ranges = [...this.ranges.slice(0, indexA), this.createEndNode(a)];
+                return;
+            }
+            if (beforeA.isEnd()) {
+                this.ranges = this.ranges.slice(indexA);
+                return;
+            }
+        }
+
+        // Deal with normal cases where the range lays in existed range area.
+        const [beforeA, afterA] = this.getBoundary(a);
+        const [beforeB, afterB] = this.getBoundary(b);
+        const indexA = this.ranges.indexOf(afterA);
+        const indexB = this.ranges.indexOf(afterB);
+
+        if (beforeA.isEnd() && beforeB.isEnd()) {
+            this.ranges = [...this.ranges.slice(0, indexA), ...this.ranges.slice(indexB)];
+            return;
+        }
+        if (beforeA.isEnd() && beforeB.isStart()) {
+            this.ranges = [...this.ranges.slice(0, indexA), this.createStartNode(b), ...this.ranges.slice(indexB)];
+            return;
+        }
+        if (beforeA.isStart() && beforeB.isEnd()) {
+            if (a === beforeA.val) {
+                this.ranges = [...this.ranges.slice(0, indexA - 1), ...this.ranges.slice(indexB)]
+            } else {
+                this.ranges = [...this.ranges.slice(0, indexA), this.createEndNode(a), ...this.ranges.slice(indexB)];
+            }
+            return;
+        }
+        if (beforeA.isStart() && beforeB.isStart()) {
+            if (a === beforeA.val) {
+                this.ranges = [...this.ranges.slice(0, indexA - 1), this.createStartNode(b), ...this.ranges.slice(indexB)]
+            } else {
+                this.ranges = [...this.ranges.slice(0, indexA), this.createEndNode(a), this.createStartNode(b), ...this.ranges.slice(indexB)];
+            }
+        }
     }
 
     print() {
         let printedRangeList = '';
+        if (this.ranges.length === 0) {
+            console.log("[]");
+            return "[]";
+        }
         // By design, the odd element is start node, the even element is end node.
         for (let i = 0; i < this.ranges.length; i += 2) {
             printedRangeList += `[${this.ranges[i].val}, ${this.ranges[i + 1].val}) `

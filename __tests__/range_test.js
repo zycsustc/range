@@ -6,13 +6,18 @@ beforeEach(() => rl = new RangeList())
 
 test('given invalid input', () => {
     console.log = jest.fn();
+
     rl.add(10);
     expect(console.log).toHaveBeenCalledWith("Input value is not a legal range!");
 })
 
+test('given empty range list and print', () => {
+    expect(rl.print()).toBe("[]");
+})
+
 describe("Add range", () => {
     test("given empty range list", () => {
-        rl.add([1,3]);
+        rl.add([1, 3]);
         expect(rl.print()).toBe("[1, 3)");
     })
 
@@ -38,5 +43,35 @@ describe("Add range", () => {
 
         rl.add([1, 30]);
         expect(rl.print()).toBe("[1, 30)");
+    })
+})
+
+describe("Remove range", () => {
+    test("given empty range list", () => {
+        rl.remove([1, 3]);
+        expect(rl.print()).toBe("[]");
+    })
+
+    test("given not empty range list", () => {
+        rl.add([1, 8]);
+        rl.add([10, 21]);
+
+        rl.remove([10, 10]);
+        expect(rl.print()).toBe("[1, 8) [10, 21)");
+
+        rl.remove([10, 11]);
+        expect(rl.print()).toBe("[1, 8) [11, 21)");
+
+        rl.remove([15, 17]);
+        expect(rl.print()).toBe("[1, 8) [11, 15) [17, 21)");
+
+        rl.remove([3, 19]);
+        expect(rl.print()).toBe("[1, 3) [19, 21)");
+
+        rl.remove([20, 23]);
+        expect(rl.print()).toBe("[1, 3) [19, 20)");
+
+        rl.remove([1, 30]);
+        expect(rl.print()).toBe("[]");
     })
 })
